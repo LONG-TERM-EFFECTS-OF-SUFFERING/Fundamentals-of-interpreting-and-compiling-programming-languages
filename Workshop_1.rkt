@@ -1,7 +1,7 @@
 #lang racket
 ; Calderón Prieto Brandon (2125874)
 ; Carlos Daniel Corrales (2122878)
-; Deisy ()
+; Melo Burbano Deisy (2041790)
 
 ; Exercise 1
 ; Contract: L -> L
