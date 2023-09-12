@@ -3,6 +3,38 @@
 ; Carlos Daniel Corrales (2122878)
 ; Melo Burbano Deisy (2041790)
 
+; --------------------------- AUXILIAR FUNCTIONS --------------------------- ;
+
+; Contract: L1, L2 -> L
+; Purpose: returns the concatenation of "L1" and "L2".
+; <list> := ()
+;        := (<scheme value> <list>)
+
+(define concat (
+	lambda (l1 l2) (
+		cond
+			[(empty? l1) l2]
+			[else (cons (car l1) (concat (cdr l1) l2))]
+	)
+))
+
+
+; Contract: E, L -> L
+; Purpose: returns "L1", but adding the element "E" in the last position of the list.
+; <list> := ()
+;        := (<scheme value> <list>)
+
+(define add (
+	lambda (element list) (
+		cond
+			[(empty? list) (cons element empty)]
+			[else (cons (car list) (add element (cdr list)))]
+	)
+))
+
+; -------------------------------------------------------------------------- ;
+
+
 ; Exercise 1
 ; Contract: L -> L
 ; Purpose: returns "L", but with its inverted ordered pairs.
@@ -100,7 +132,6 @@
 ; <list> := ()
 ;        := (<scheme value> <list>)
 
-
 (define (list-index p list)
 	(define (aux index list)
 		(cond
@@ -116,13 +147,13 @@
 ; (list-index symbol? '(a (b c) 17 foo)) -> 0
 ; (list-index symbol? '(1 2 (a b) 3)) -> #f
 
+
 ; Exercise 6
 ; Contract: E1, E2, L -> L
 ; Purpose: The function returns a list L, and each occurrence of E1 is replaced by E2 and each
 ; occurrence of E1 is replaced by E2.
 ; <list> := ()
 ;        := (<scheme value> <list>)
-
 
 (define (mapAux transform-func list)
 	(if (empty? list)
