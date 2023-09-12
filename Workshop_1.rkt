@@ -93,12 +93,12 @@
 ; (filter-in symbol? '(a (b c) 17 foo))
 ; (filter-in string? '(a b u "univalle" "racket" "flp" 28 90 (1 2 3)))
 
-;;; Exercise 5
-;;; Contract: P, L -> L
-;;; Purpose: Returns (counting from position 0) the first element in the list that satisfy the
-;;; predicate "p"
-;;; <list> := ()
-;;;        := (<scheme value> <list>)
+; Exercise 5
+; Contract: P, L -> L
+; Purpose: Returns (counting from position 0) the first element in the list that satisfy the
+; predicate "p"
+; <list> := ()
+;        := (<scheme value> <list>)
 
 
 (define (list-index p list)
@@ -112,20 +112,20 @@
 	(aux 0 list)
 )
 
-;;; (list-index number? '(a 2 (1 3) b 7)) -> 1
-;;; (list-index symbol? '(a (b c) 17 foo)) -> 0
-;;; (list-index symbol? '(1 2 (a b) 3)) -> #f
+; (list-index number? '(a 2 (1 3) b 7)) -> 1
+; (list-index symbol? '(a (b c) 17 foo)) -> 0
+; (list-index symbol? '(1 2 (a b) 3)) -> #f
 
-;;; Exercise 6
-;;; Contract: E1, E2, L -> L
-;;; Purpose: The function returns a list L, and each occurrence of E1 is replaced by E2 and each 
-;;; occurrence of E1 is replaced by E2.
-;;; <list> := ()
-;;;        := (<scheme value> <list>)
+; Exercise 6
+; Contract: E1, E2, L -> L
+; Purpose: The function returns a list L, and each occurrence of E1 is replaced by E2 and each
+; occurrence of E1 is replaced by E2.
+; <list> := ()
+;        := (<scheme value> <list>)
 
 
 (define (mapAux transform-func list)
-	(if (empty? list) 
+	(if (empty? list)
 		'()
 		(cons (transform-func (car list)) (mapAux transform-func (cdr list)))
 	)
@@ -141,8 +141,59 @@
 	(mapAux swap-element list)
 )
 
-;;; (swapper 'a 'd '(a b c d)) -> (d b c a)
-;;; (swapper 'a 'd '(a d () c d)) -> (d a () c a)
-;;; (swapper 'x 'y '(y y x y x y x x y)) -> (x x y x y x y y x)
+; (swapper 'a 'd '(a b c d)) -> (d b c a)
+; (swapper 'a 'd '(a d () c d)) -> (d a () c a)
+; (swapper 'x 'y '(y y x y x y x x y)) -> (x x y x y x y y x)
 
 
+
+; Exercise 16
+; Contract: L -> N
+; Purpose: returns the result of performing the corresponding addition, subtraction and multiplication operations.
+; <binary-operation> ::= <int>
+;                    ::= (<binary-operation> 'suma <binary-operation>)
+;                    ::= (<binary-operation> 'resta <binary-operation>)
+;                    ::= (<binary-operation> 'multiplica <binary-operation>)
+
+(define Operar-binarias (
+	lambda (operation) (
+		cond
+			[(number? operation) operation]
+			[(eqv? (cadr operation) 'suma) (+ (Operar-binarias (car operation)) (Operar-binarias (caddr operation)))]
+			[(eqv? (cadr operation) 'resta) (- (Operar-binarias (car operation)) (Operar-binarias (caddr operation)))]
+			[(eqv? (cadr operation) 'multiplica) (* (Operar-binarias (car operation)) (Operar-binarias (caddr operation)))]
+	)
+))
+
+; (Operar-binarias '(2 suma 9))
+; (Operar-binarias '(2 resta 9))
+; (Operar-binarias '(2 multiplica 9))
+; (Operar-binarias '( (2 multiplica 3) suma (5 resta 1)))
+; (Operar-binarias '( (2 multiplica (4 suma 1)) multiplica ((2 multiplica 4) resta 1) ))
+
+
+
+
+; Exercise 18
+; Contract: N -> L
+; Purpose: returns row "N" of Pascal's triangle.
+; <list> := ()
+;        := (<scheme value> <list>)
+
+(define pascal (
+	lambda (n) (
+		letrec (
+			(get-row (
+				lambda (n actual-row) (
+					if (= n 1)
+						actual-row
+						(get-row (- n 1) (zip + (cons 0 actual-row) (add 0 actual-row)))
+				)
+			))
+		)
+		(get-row n (cons 1 empty))
+	)
+))
+
+; (pascal 5)
+; (pascal 1)
