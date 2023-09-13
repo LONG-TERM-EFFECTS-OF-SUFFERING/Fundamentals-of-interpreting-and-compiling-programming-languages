@@ -3,6 +3,66 @@
 ; Corrales Carlos Daniel (2122878)
 ; Melo Burbano Deisy (2041790)
 
+; --------------------------- AUXILIAR FUNCTIONS --------------------------- ;
+
+; Contract: L1, L2 -> L
+; Purpose: returns the concatenation of "L1" and "L2".
+; <list> := ()
+;        := (<scheme value> <list>)
+
+(define concat (
+	lambda (l1 l2) (
+		cond
+			[(empty? l1) l2]
+			[else (cons (car l1) (concat (cdr l1) l2))]
+	)
+))
+
+
+; Contract: E, L -> L
+; Purpose: returns "L1", but adding the element "E" in the last position of the list.
+; <list> := ()
+;        := (<scheme value> <list>)
+
+(define add (
+	lambda (element list) (
+		cond
+			[(empty? list) (cons element empty)]
+			[else (cons (car list) (add element (cdr list)))]
+	)
+))
+
+; Contract: transform-function (unary function), L -> L
+; Purpose: returns a new list containing the results of applying the transform-function to 
+; each element of the input list
+; <list> := ()
+;        := (<scheme value> <list>)
+
+(define (mapAux transform-function list)
+			(if (empty? list) 
+				'()
+				(cons (transform-function (car list)) (mapAux transform-function (cdr list)))
+			)
+)
+
+; Contract: L1, L2 -> L
+; Purpose: returns a list of pairs, where each pair consists of element L1 and an element from list L2.
+; <list> := ()
+;        := (<scheme value> <list>)
+
+(define cartesian-productAux
+  	(lambda (l1 l2)
+    	(if (empty? l2)
+        	'()
+        	(cons (list l1 (car l2)) (cartesian-productAux l1 (cdr l2)))
+		)
+	)
+)
+
+
+; -------------------------------------------------------------------------- ;
+
+
 ; Exercise 1
 ; Contract: L -> L
 ; Purpose: returns "L", but with its inverted ordered pairs.
@@ -100,7 +160,6 @@
 ; <list> := ()
 ;        := (<scheme value> <list>)
 
-
 (define (list-index p list)
 	(define (aux index list)
 		(cond
@@ -147,7 +206,7 @@
 	(lambda(l1 l2)
 		(if (empty? l1)
 			'()
-			(appendAux (cartesian-productAux (car l1) l2) (cartesian-product (cdr l1) l2))
+			(concat (cartesian-productAux (car l1) l2) (cartesian-product (cdr l1) l2))
 		)
 	)
 )
@@ -155,3 +214,50 @@
 ; (cartesian-product '(a b c) '(x y)) -> ((a x) (a y) (b x) (b y) (c x) (c y))
 ; (cartesian-product '(p q r) '(5 6 7)) -> ((p 5) (p 6) (p 7) (q 5) (q 6) (q 7) (r 5) (r 6) (r 7))
 
+; Exercise 16
+; Contract: L -> N
+; Purpose: returns the result of performing the corresponding addition, subtraction and multiplication operations.
+; <binary-operation> ::= <int>
+;                    ::= (<binary-operation> 'suma <binary-operation>)
+;                    ::= (<binary-operation> 'resta <binary-operation>)
+;                    ::= (<binary-operation> 'multiplica <binary-operation>)
+
+(define Operar-binarias (
+	lambda (operation) (
+		cond
+			[(number? operation) operation]
+			[(eqv? (cadr operation) 'suma) (+ (Operar-binarias (car operation)) (Operar-binarias (caddr operation)))]
+			[(eqv? (cadr operation) 'resta) (- (Operar-binarias (car operation)) (Operar-binarias (caddr operation)))]
+			[(eqv? (cadr operation) 'multiplica) (* (Operar-binarias (car operation)) (Operar-binarias (caddr operation)))]
+	)
+))
+
+; (Operar-binarias '(2 suma 9))
+; (Operar-binarias '(2 resta 9))
+; (Operar-binarias '(2 multiplica 9))
+; (Operar-binarias '( (2 multiplica 3) suma (5 resta 1)))
+; (Operar-binarias '( (2 multiplica (4 suma 1)) multiplica ((2 multiplica 4) resta 1) ))
+
+; Exercise 18
+; Contract: N -> L
+; Purpose: returns row "N" of Pascal's triangle.
+; <list> := ()
+;        := (<scheme value> <list>)
+
+(define pascal (
+	lambda (n) (
+		letrec (
+			(get-row (
+				lambda (n actual-row) (
+					if (= n 1)
+						actual-row
+						(get-row (- n 1) (zip + (cons 0 actual-row) (add 0 actual-row)))
+				)
+			))
+		)
+		(get-row n (cons 1 empty))
+	)
+))
+
+; (pascal 5)
+; (pascal 1)
