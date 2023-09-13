@@ -176,6 +176,65 @@
 ; (swapper 'a 'd '(a d () c d)) -> (d a () c a)
 ; (swapper 'x 'y '(y y x y x y x x y)) -> (x x y x y x y y x)
 
+; Exercise 9
+; Contract: L -> n
+; Purpose: Returns the number of inversions 'n' in the list 'L'
+; <lista> := ()
+;	  := (<number> <lista>)
+
+
+(define inversions (lambda (l)
+		    (letrec(
+			(compair(lambda (l n)
+                           (if  (null? (cdr l))
+                                0
+                           (if (> n (cadr l))
+                               (+ 1 (compair(cdr l) n) )
+                               (compair(cdr l) n)
+                               )))
+		    ))
+                    (if  (null? (cdr l))
+                         0
+                        (+ (compair l (car l) ) (inversions (cdr l)))
+                         )
+
+                     )))
+
+ ;Probes
+ (inversions'(2 3 8 6 1))
+ (inversions'(1 2 3 4))
+ (inversions'(3 2 1))
+
+;Exercise 10
+; Contract: <list> -> <list> 
+; Purpose: Receive a list and remove a pair of parentheses from each element within the list
+; if the element doesn't have parentheses, then include it in the resulting output without any modification.
+; <list> := ()
+;        := (<scheme-value> <lista>)
+
+(define up(lambda (list)
+            (letrec(
+              (add(lambda (listA listB)
+                        (if (null? listA)
+                             listB
+                             (cons (car listA) (add (cdr listA) listB))
+                             ))
+                    ))
+              (cond
+                [(null? list) empty]
+                [(list? (car list)) (add (car list) (up (cdr list)))]
+                [else (cons (car list) (up (cdr list)))]
+                )
+              )
+            )
+)
+
+;Probes
+(up '((1 2) (3 4)))
+(up '((x (y)) z))
+(up '((1 2 3) 4 ((e (f)))))
+
+
 
 
 ; Exercise 16
