@@ -1,6 +1,6 @@
 #lang racket
 ; Calderón Prieto Brandon (2125874)
-; Carlos Daniel Corrales (2122878)
+; Corrales Carlos Daniel (2122878)
 ; Melo Burbano Deisy (2041790)
 
 ; Exercise 1
@@ -93,12 +93,12 @@
 ; (filter-in symbol? '(a (b c) 17 foo))
 ; (filter-in string? '(a b u "univalle" "racket" "flp" 28 90 (1 2 3)))
 
-;;; Exercise 5
-;;; Contract: P, L -> L
-;;; Purpose: Returns (counting from position 0) the first element in the list that satisfy the
-;;; predicate "p"
-;;; <list> := ()
-;;;        := (<scheme value> <list>)
+; Exercise 5
+; Contract: P, L -> L
+; Purpose: Returns (counting from position 0) the first element in the list that satisfy the
+; predicate "p"
+; <list> := ()
+;        := (<scheme value> <list>)
 
 
 (define (list-index p list)
@@ -112,37 +112,46 @@
 	(aux 0 list)
 )
 
-;;; (list-index number? '(a 2 (1 3) b 7)) -> 1
-;;; (list-index symbol? '(a (b c) 17 foo)) -> 0
-;;; (list-index symbol? '(1 2 (a b) 3)) -> #f
+; (list-index number? '(a 2 (1 3) b 7)) -> 1
+; (list-index symbol? '(a (b c) 17 foo)) -> 0
+; (list-index symbol? '(1 2 (a b) 3)) -> #f
 
-;;; Exercise 6
-;;; Contract: E1, E2, L -> L
-;;; Purpose: The function returns a list L, and each occurrence of E1 is replaced by E2 and each 
-;;; occurrence of E1 is replaced by E2.
-;;; <list> := ()
-;;;        := (<scheme value> <list>)
-
-
-(define (mapAux transform-func list)
-	(if (empty? list) 
-		'()
-		(cons (transform-func (car list)) (mapAux transform-func (cdr list)))
-	)
-)
+; Exercise 6
+; Contract: E1, E2, L -> L
+; Purpose: The function returns a list L, and each occurrence of E1 is replaced by E2 and each 
+; occurrence of E1 is replaced by E2.
+; <list> := ()
+;        := (<scheme value> <list>)
 
 (define (swapper e1 e2 list)
-	(define (swap-element x)
+	(define (swap x)
 		(cond
 			[(equal? x e1) e2]
 			[(equal? x e2) e1]
 			[else x])
 			)
-	(mapAux swap-element list)
+	(mapAux swap list)
 )
 
-;;; (swapper 'a 'd '(a b c d)) -> (d b c a)
-;;; (swapper 'a 'd '(a d () c d)) -> (d a () c a)
-;;; (swapper 'x 'y '(y y x y x y x x y)) -> (x x y x y x y y x)
+; (swapper 'a 'd '(a b c d)) -> (d b c a)
+; (swapper 'a 'd '(a d () c d)) -> (d a () c a)
+; (swapper 'x 'y '(y y x y x y x x y)) -> (x x y x y x y y x)
 
+; Exercise 7
+; Contract: L1, L2 -> L
+; Purpose: Returns a list of tuples with the Cartesian product between L1 and L2
+; <list> := ()
+;        := (<scheme value> <list>)
+
+(define cartesian-product
+	(lambda(l1 l2)
+		(if (empty? l1)
+			'()
+			(appendAux (cartesian-productAux (car l1) l2) (cartesian-product (cdr l1) l2))
+		)
+	)
+)
+
+; (cartesian-product '(a b c) '(x y)) -> ((a x) (a y) (b x) (b y) (c x) (c y))
+; (cartesian-product '(p q r) '(5 6 7)) -> ((p 5) (p 6) (p 7) (q 5) (q 6) (q 7) (r 5) (r 6) (r 7))
 
