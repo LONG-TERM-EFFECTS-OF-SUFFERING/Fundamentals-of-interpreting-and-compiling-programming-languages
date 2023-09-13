@@ -200,17 +200,17 @@
 
                      )))
 
- ;Probes
+ ;Proofs
  (inversions'(2 3 8 6 1))
  (inversions'(1 2 3 4))
  (inversions'(3 2 1))
 
 ;Exercise 10
-; Contract: <list> -> <list> 
+; Contract: L -> L' 
 ; Purpose: Receive a list and remove a pair of parentheses from each element within the list
 ; if the element doesn't have parentheses, then include it in the resulting output without any modification.
 ; <list> := ()
-;        := (<scheme-value> <lista>)
+;        := (<scheme-value> <list>)
 
 (define up(lambda (list)
             (letrec(
@@ -229,11 +229,51 @@
             )
 )
 
-;Probes
+;Proofs
 (up '((1 2) (3 4)))
 (up '((x (y)) z))
 (up '((1 2 3) 4 ((e (f)))))
 
+; Exercise 11
+; Contract:F, L1, L2 -> L
+; Purpose: Return a list where the n position corresponds to the result of
+; applying function F to the elements at the nth position in L1 and L2.
+;<int - list> ::= ()
+;             ::= (<int> <int - list>)
+
+(define zip (lambda (f L1 L2)
+    (if (null? L1)
+        empty
+        (cons
+         (f (car L1) (car L2))
+         (zip f (cdr L1) (cdr L2)))
+    )
+))
+
+;Proofs
+(zip + '(1 4) '(6 2))
+(zip * '(11 5 6) '(10 9 8))
+(zip - '(2 3) '(5 4))
+
+; Exercise 12
+; Contract: a, b, F, acum, filter -> n
+; Propose: Apply the binary function F to all elements within
+; the interval [a, b] that also satisfy the predicate of function F.
+;
+
+(define filter-acum(lambda (a b F acum filter)
+   (if (> a b)
+       acum
+       (if (filter a)
+           (filter-acum (+ a 1) b F (F a acum) filter)
+           (filter-acum (+ a 1) b F acum filter)
+           ))
+   ))
+
+; Proofs
+(filter-acum 1 10 + 0 odd?)
+(filter-acum 1 10 + 0 even?)
+(filter-acum 1 10 + 1 number?)
 
 
 
