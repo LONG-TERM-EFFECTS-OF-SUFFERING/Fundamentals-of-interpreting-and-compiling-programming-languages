@@ -5,8 +5,8 @@
 
 ; --------------------------- AUXILIAR FUNCTIONS --------------------------- ;
 
-; Contract: L1, L2 -> L
-; Purpose: returns the concatenation of "L1" and "L2".
+; Contract: L, L -> L
+; Purpose: returns the concatenation of "list1" and "list2".
 ; <list> := ()
 ;        := (<scheme value> <list>)
 
@@ -20,7 +20,7 @@
 
 
 ; Contract: E, L -> L
-; Purpose: returns "L1", but adding the element "E" in the last position of the list.
+; Purpose: returns "list", but adding the element "element" in the last position of the list.
 ; <list> := ()
 ;        := (<scheme value> <list>)
 
@@ -33,13 +33,13 @@
 ))
 
 ; Contract: transform-function (unary function), L -> L
-; Purpose: returns a new list containing the results of applying the transform-function to 
+; Purpose: returns a new list containing the results of applying the transform-function to
 ; each element of the input list
 ; <list> := ()
 ;        := (<scheme value> <list>)
 
 (define (mapAux transform list)
-			(if (empty? list) 
+			(if (empty? list)
 				'()
 				(cons (transform (car list)) (mapAux transform (cdr list)))
 			)
@@ -52,26 +52,30 @@
 
 (define cartesian-productAux
   	(lambda (l1 l2)
-    	(if (empty? l2)
-        	'()
-        	(cons (list l1 (car l2)) (cartesian-productAux l1 (cdr l2)))
+		(if (empty? l2)
+			'()
+			(cons (list l1 (car l2)) (cartesian-productAux l1 (cdr l2)))
 		)
 	)
 )
-
 
 ; -------------------------------------------------------------------------- ;
 
 
 ; Exercise 1
 ; Contract: L -> L
-; Purpose: returns "L", but with its inverted ordered pairs.
+; Purpose: returns "list", but with its inverted ordered pairs.
 ; <list> := ()
 ;        := (<scheme value> <list>)
 
 (define invert (
 	lambda (list) (
 		let (
+			; Contract: L -> L
+			; Purpose: returns "pair", but with its inverted elements.
+			; <list> := ()
+			;        := (<scheme value> <list>)
+
 			(invert-pair (
 				lambda (pair) (
 					cons (cadr pair ) (cons (car pair) empty)
@@ -87,18 +91,24 @@
 ; (invert '((a 1) (a 2) (1 b) (2 b)))
 ; (invert '((5 9) (10 91) (82 7) (a e) ("hola" "Mundo")))
 ; (invert '(("es" "racket") ("genial" "muy") (17 29) (81 0)))
+; (invert '((1 2) (3 4) (5 6)))
 
 
 ; Exercise 2
 ; Contract: L -> L
-; Purpose: returns a list with each element of "L" associated with one more level of parentheses
-; compared to its original state in "L".
+; Purpose: returns a list with each element of "list" associated with one more level of parentheses
+; compared to its original state in "list".
 ; <list> := ()
 ;        := (<scheme value> <list>)
 
 (define down (
 	lambda (list) (
 		let (
+			; Contract: E -> L
+			; Purpose: returns "element", but in a list.
+			; <list> := ()
+			;        := (<scheme value> <list>)
+
 			(add-parenthesis (
 				lambda (element) (
 					cons element empty
@@ -114,11 +124,12 @@
 ; (down '((a 1) (a 2) (1 b) (2 b)))
 ; (down '((una) (buena) (idea)))
 ; (down '(un (objeto (mas)) complicado))
+; (down '(((1) (2)) ((3) (4)) ((5) (6))))
 
 
 ; Exercise 3
 ; Contract: L, N, X -> L
-; Purpose: returns "L", but with element "x" at position "n".
+; Purpose: returns "list", but with element "x" at position "n".
 ; <list> := ()
 ;        := (<scheme value> <list>)
 
@@ -132,11 +143,12 @@
 
 ; (list-set '(a b c d) 2 '(1 2))
 ; (list-set '(a b c d) 3 '(1 5 10))
+; (list-set '((1 2) (3 4)) 1 '(5 6))
 
 
 ; Exercise 4
 ; Contract: P, L -> L
-; Purpose: returns a list that contains the elements that belong to "L" and satisfy the predicate "P".
+; Purpose: returns a list that contains the elements that belong to "list" and satisfy the predicate "p".
 ; <list> := ()
 ;        := (<scheme value> <list>)
 
@@ -181,7 +193,7 @@
 
 ; Exercise 6
 ; Contract: E1, E2, L -> L
-; Purpose: The function returns a list L, and each occurrence of E1 is replaced by E2 and each 
+; Purpose: The function returns a list L, and each occurrence of E1 is replaced by E2 and each
 ; occurrence of E1 is replaced by E2.
 ; <list> := ()
 ;        := (<scheme value> <list>)
@@ -219,12 +231,12 @@
 ; (cartesian-product '(a b c) '(x y)) -> ((a x) (a y) (b x) (b y) (c x) (c y))
 ; (cartesian-product '(p q r) '(5 6 7)) -> ((p 5) (p 6) (p 7) (q 5) (q 6) (q 7) (r 5) (r 6) (r 7))
 
+
 ; Exercise 9
 ; Contract: L -> n
 ; Purpose: Returns the number of inversions 'n' in the list 'L'
 ; <lista> := ()
-;	  := (<number> <lista>)
-
+;         := (<number> <lista>)
 
 (define inversions (lambda (l)
 		    (letrec(
@@ -244,38 +256,40 @@
                      )))
 
  ;Proofs
-;  (inversions'(2 3 8 6 1))
-;  (inversions'(1 2 3 4))
-;  (inversions'(3 2 1))
+; (inversions'(2 3 8 6 1))
+; (inversions'(1 2 3 4))
+; (inversions'(3 2 1))
+
 
 ;Exercise 10
-; Contract: L -> L' 
+; Contract: L -> L'
 ; Purpose: Receive a list and remove a pair of parentheses from each element within the list
 ; if the element doesn't have parentheses, then include it in the resulting output without any modification.
 ; <list> := ()
 ;        := (<scheme-value> <list>)
 
 (define up(lambda (list)
-            (letrec(
-              (add(lambda (listA listB)
-                        (if (null? listA)
-                             listB
-                             (cons (car listA) (add (cdr listA) listB))
-                             ))
-                    ))
-              (cond
-                [(null? list) empty]
-                [(list? (car list)) (add (car list) (up (cdr list)))]
-                [else (cons (car list) (up (cdr list)))]
-                )
-              )
-            )
+		(letrec(
+			(add(lambda (listA listB)
+					(if (null? listA)
+							listB
+							(cons (car listA) (add (cdr listA) listB))
+							))
+				))
+			(cond
+			[(null? list) empty]
+			[(list? (car list)) (add (car list) (up (cdr list)))]
+			[else (cons (car list) (up (cdr list)))]
+			)
+			)
+		)
 )
 
 ;Proofs
 ; (up '((1 2) (3 4)))
 ; (up '((x (y)) z))
 ; (up '((1 2 3) 4 ((e (f)))))
+
 
 ; Exercise 11
 ; Contract:F, L1, L2 -> L
@@ -285,12 +299,12 @@
 ;             ::= (<int> <int - list>)
 
 (define zip (lambda (f L1 L2)
-    (if (null? L1)
-        empty
-        (cons
-         (f (car L1) (car L2))
-         (zip f (cdr L1) (cdr L2)))
-    )
+	(if (null? L1)
+		empty
+		(cons
+			(f (car L1) (car L2))
+			(zip f (cdr L1) (cdr L2)))
+	)
 ))
 
 ;Proofs
@@ -298,25 +312,26 @@
 ; (zip * '(11 5 6) '(10 9 8))
 ; (zip - '(2 3) '(5 4))
 
+
 ; Exercise 12
 ; Contract: a, b, F, acum, filter -> n
 ; Propose: Apply the binary function F to all elements within
 ; the interval [a, b] that also satisfy the predicate of function F.
-;
 
 (define filter-acum(lambda (a b F acum filter)
-   (if (> a b)
-       acum
-       (if (filter a)
-           (filter-acum (+ a 1) b F (F a acum) filter)
-           (filter-acum (+ a 1) b F acum filter)
-           ))
-   ))
+	(if (> a b)
+		acum
+		(if (filter a)
+			(filter-acum (+ a 1) b F (F a acum) filter)
+			(filter-acum (+ a 1) b F acum filter)
+			))
+))
 
 ; Proofs
 ; (filter-acum 1 10 + 0 odd?)
 ; (filter-acum 1 10 + 0 even?)
 ; (filter-acum 1 10 + 1 number?)
+
 
 ; Exercise 16
 ; Contract: L -> N
@@ -341,16 +356,23 @@
 ; (Operar-binarias '(2 multiplica 9))
 ; (Operar-binarias '( (2 multiplica 3) suma (5 resta 1)))
 ; (Operar-binarias '( (2 multiplica (4 suma 1)) multiplica ((2 multiplica 4) resta 1) ))
+; (Operar-binarias '( (5 multiplica 3) multiplica (6 multiplica 7)))
+
 
 ; Exercise 18
 ; Contract: N -> L
-; Purpose: returns row "N" of Pascal's triangle.
+; Purpose: returns the row "N" of Pascal's triangle.
 ; <list> := ()
 ;        := (<scheme value> <list>)
 
 (define pascal (
 	lambda (n) (
 		letrec (
+			; Contract: N, L -> L
+			; Purpose: returns the row "N" of Pascal's triangle.
+			; <list> := ()
+			;        := (<scheme value> <list>)
+
 			(get-row (
 				lambda (n actual-row) (
 					if (= n 1)
@@ -365,3 +387,4 @@
 
 ; (pascal 5)
 ; (pascal 1)
+; (pascal 4)
