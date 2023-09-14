@@ -231,6 +231,27 @@
 ; (cartesian-product '(a b c) '(x y)) -> ((a x) (a y) (b x) (b y) (c x) (c y))
 ; (cartesian-product '(p q r) '(5 6 7)) -> ((p 5) (p 6) (p 7) (q 5) (q 6) (q 7) (r 5) (r 6) (r 7))
 
+; Exercise 8
+; Contract: 
+; Purpose: 
+; <list> := ()
+;        := (<scheme value> <list>)
+
+(define mapping
+	(lambda (f l1 l2)
+		(cond 
+			[(or (empty? l1) (empty? l2)) '()]
+			[else (if (= (f (car l1)) (car l2))
+					(cons (list (car l1) (car l2)) (mapping f (cdr l1) (cdr l2)))
+					(mapping f (cdr l1) (cdr l2)))]
+		)
+	)
+)
+
+; (mapping (lambda (d) (* d 2)) (list 1 2 3) (list 2 4 6)) -> ((1 2) (2 4) (3 6))
+; (mapping (lambda (d) (* d 3)) (list 1 2 2) (list 2 4 6)) -> ((2 6))
+; (mapping (lambda (d) (* d 2)) (list 1 2 3) (list 3 9 12)) -> ()
+
 
 ; Exercise 9
 ; Contract: L -> n
