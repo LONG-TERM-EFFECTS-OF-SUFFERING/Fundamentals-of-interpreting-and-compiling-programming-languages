@@ -38,10 +38,10 @@
 ; <list> := ()
 ;        := (<scheme value> <list>)
 
-(define (mapAux transform-function list)
+(define (mapAux transform list)
 			(if (empty? list) 
 				'()
-				(cons (transform-function (car list)) (mapAux transform-function (cdr list)))
+				(cons (transform (car list)) (mapAux transform (cdr list)))
 			)
 )
 
@@ -160,16 +160,20 @@
 ; <list> := ()
 ;        := (<scheme value> <list>)
 
-(define (list-index p list)
-	(define (aux index list)
-		(cond
-			[(empty? list) #f]
-			[(p (car list)) index]
-			[else (aux (+ index 1) (cdr list))]
+
+(define list-index
+	(lambda(p list)
+		(letrec((search (lambda(index list)
+							(cond
+								[(empty? list) #f]
+								[(p (car list)) index]
+								[else (search (+ index 1) (cdr list))]
+								))
+					))
+		(search 0 list)
 			)
 		)
-	(aux 0 list)
-)
+	)
 
 ; (list-index number? '(a 2 (1 3) b 7)) -> 1
 ; (list-index symbol? '(a (b c) 17 foo)) -> 0
@@ -182,15 +186,16 @@
 ; <list> := ()
 ;        := (<scheme value> <list>)
 
-(define (swapper e1 e2 list)
-	(define (swap x)
-		(cond
-			[(equal? x e1) e2]
-			[(equal? x e2) e1]
-			[else x])
-			)
-	(mapAux swap list)
-)
+(define swapper
+	(lambda (e1 e2 list)
+    	(letrec ((swap (lambda (x)
+                	(cond
+                    	[(equal? x e1) e2]
+                    	[(equal? x e2) e1]
+                    	[else x]
+						))
+					))
+    (mapAux swap list))))
 
 ; (swapper 'a 'd '(a b c d)) -> (d b c a)
 ; (swapper 'a 'd '(a d () c d)) -> (d a () c a)
@@ -213,6 +218,105 @@
 
 ; (cartesian-product '(a b c) '(x y)) -> ((a x) (a y) (b x) (b y) (c x) (c y))
 ; (cartesian-product '(p q r) '(5 6 7)) -> ((p 5) (p 6) (p 7) (q 5) (q 6) (q 7) (r 5) (r 6) (r 7))
+
+; Exercise 9
+; Contract: L -> n
+; Purpose: Returns the number of inversions 'n' in the list 'L'
+; <lista> := ()
+;	  := (<number> <lista>)
+
+
+(define inversions (lambda (l)
+		    (letrec(
+			(compair(lambda (l n)
+                           (if  (null? (cdr l))
+                                0
+                           (if (> n (cadr l))
+                               (+ 1 (compair(cdr l) n) )
+                               (compair(cdr l) n)
+                               )))
+		    ))
+                    (if  (null? (cdr l))
+                         0
+                        (+ (compair l (car l) ) (inversions (cdr l)))
+                         )
+
+                     )))
+
+ ;Proofs
+;  (inversions'(2 3 8 6 1))
+;  (inversions'(1 2 3 4))
+;  (inversions'(3 2 1))
+
+;Exercise 10
+; Contract: L -> L' 
+; Purpose: Receive a list and remove a pair of parentheses from each element within the list
+; if the element doesn't have parentheses, then include it in the resulting output without any modification.
+; <list> := ()
+;        := (<scheme-value> <list>)
+
+(define up(lambda (list)
+            (letrec(
+              (add(lambda (listA listB)
+                        (if (null? listA)
+                             listB
+                             (cons (car listA) (add (cdr listA) listB))
+                             ))
+                    ))
+              (cond
+                [(null? list) empty]
+                [(list? (car list)) (add (car list) (up (cdr list)))]
+                [else (cons (car list) (up (cdr list)))]
+                )
+              )
+            )
+)
+
+;Proofs
+; (up '((1 2) (3 4)))
+; (up '((x (y)) z))
+; (up '((1 2 3) 4 ((e (f)))))
+
+; Exercise 11
+; Contract:F, L1, L2 -> L
+; Purpose: Return a list where the n position corresponds to the result of
+; applying function F to the elements at the nth position in L1 and L2.
+;<int - list> ::= ()
+;             ::= (<int> <int - list>)
+
+(define zip (lambda (f L1 L2)
+    (if (null? L1)
+        empty
+        (cons
+         (f (car L1) (car L2))
+         (zip f (cdr L1) (cdr L2)))
+    )
+))
+
+;Proofs
+; (zip + '(1 4) '(6 2))
+; (zip * '(11 5 6) '(10 9 8))
+; (zip - '(2 3) '(5 4))
+
+; Exercise 12
+; Contract: a, b, F, acum, filter -> n
+; Propose: Apply the binary function F to all elements within
+; the interval [a, b] that also satisfy the predicate of function F.
+;
+
+(define filter-acum(lambda (a b F acum filter)
+   (if (> a b)
+       acum
+       (if (filter a)
+           (filter-acum (+ a 1) b F (F a acum) filter)
+           (filter-acum (+ a 1) b F acum filter)
+           ))
+   ))
+
+; Proofs
+; (filter-acum 1 10 + 0 odd?)
+; (filter-acum 1 10 + 0 even?)
+; (filter-acum 1 10 + 1 number?)
 
 ; Exercise 16
 ; Contract: L -> N
