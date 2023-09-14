@@ -332,6 +332,66 @@
 ; (filter-acum 1 10 + 0 even?)
 ; (filter-acum 1 10 + 1 number?)
 
+; Exercise 13
+; Contract: lrators, lrands -> n
+; Propose: Return the result of successively applying the operations
+; in 'lrators' to the values in 'lrands'.
+; <list> := (<int> <list>)
+
+(define operate
+  (lambda (Irators Irands)(
+    letrec(
+        (explore(
+           lambda (l)(
+             if (null? l) 0 (+ 1 (explore(cdr l))))))
+      )
+     (if (< (explore Irands) (explore Irators)) 'error
+        (if (null? (cdr Irators))
+        ((car Irators) (car Irands) (cadr Irands))
+        ( operate (cdr Irators) (cons ((car Irators) (car Irands) (cadr Irands)) (cddr Irands)))))
+  )))
+
+
+;Proofs
+;(operate (list + * + - *) '(1 2 8 4 11 6))
+;(operate (list *) '(4 5))
+;(operate (list + - *) '(0 1 2 3 4 5))
+
+; Exercise 14
+; Contract: n, bst -> list
+; Propose: Return a list with the path to take, as indicated by a binary tree, to reach the received number n.
+; If the number is in the root node, return an empty list.
+; <binaryTree> := ( ́emptyTree) empty
+;                 := (nodo) number <binaryTree> < binaryTree>
+
+(define path (lambda (n bst)
+                (if (< n (car bst))
+                    (if (number? (cadr bst))
+                        (if (= n (cadr bst))
+                            (cons 'left empty)
+                            #f
+                          )
+                        (if (= n ( car (cadr bst)) )
+                           (cons 'left empty)
+                           ( cons 'left (path n (cadr bst)) )
+                         )
+                      )
+                    (if (number? (caddr bst))
+                        (if (= n (caddr bst))
+                            (cons 'right empty)
+                            #f
+                          )
+
+                        (if (= n ( car (caddr bst)) )
+                           (cons 'right empty)
+                           ( cons 'right (path n (caddr bst)) )
+                         )
+                      )
+    )))
+
+; Proofs
+(path 17 '(14 (7 () (12 () ()))(26 (20 (17 () ())())(31 () ()))))
+
 
 ; Exercise 16
 ; Contract: L -> N
