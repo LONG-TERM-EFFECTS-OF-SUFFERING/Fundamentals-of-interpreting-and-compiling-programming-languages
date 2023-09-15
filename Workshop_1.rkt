@@ -172,7 +172,6 @@
 ; <list> := ()
 ;        := (<scheme value> <list>)
 
-
 (define list-index
 	(lambda(p list)
 		(letrec((search (lambda(index list)
@@ -187,16 +186,17 @@
 		)
 	)
 
-; (list-index number? '(a 2 (1 3) b 7)) -> 1
-; (list-index symbol? '(a (b c) 17 foo)) -> 0
-; (list-index symbol? '(1 2 (a b) 3)) -> #f
+;Proofs
+;	(list-index number? '(a 2 (1 3) b 7)) -> 1
+;	(list-index symbol? '(a (b c) 17 foo)) -> 0
+;	(list-index symbol? '(1 2 (a b) 3)) -> #f
 
 ; Exercise 6
 ; Contract: E1, E2, L -> L
 ; Purpose: The function returns a list L, and each occurrence of E1 is replaced by E2 and each
 ; occurrence of E1 is replaced by E2.
 ; <list> := ()
-;        := (<scheme value> <list>)
+;        := (<scheme value> <scheme value> <list>)
 
 (define swapper
 	(lambda (e1 e2 list)
@@ -209,6 +209,7 @@
 					))
     (mapAux swap list))))
 
+;Proofs
 ; (swapper 'a 'd '(a b c d)) -> (d b c a)
 ; (swapper 'a 'd '(a d () c d)) -> (d a () c a)
 ; (swapper 'x 'y '(y y x y x y x x y)) -> (x x y x y x y y x)
@@ -228,12 +229,15 @@
 	)
 )
 
+;Proofs: 
 ; (cartesian-product '(a b c) '(x y)) -> ((a x) (a y) (b x) (b y) (c x) (c y))
 ; (cartesian-product '(p q r) '(5 6 7)) -> ((p 5) (p 6) (p 7) (q 5) (q 6) (q 7) (r 5) (r 6) (r 7))
+; (cartesian-product '(x y) '(p q r)) -> ((x p) (x q) (x r) (y p) (y q) (y r))
 
 ; Exercise 8
-; Contract: 
-; Purpose: 
+; Contract: F, L1, L2 -> L
+; Purpose: returns a list of pairs (a, b) where a is an element of the list l1, b is an element 
+; of the list l2, and f(a) = b holds for each pair.
 ; <list> := ()
 ;        := (<scheme value> <list>)
 
@@ -256,8 +260,8 @@
 ; Exercise 9
 ; Contract: L -> n
 ; Purpose: Returns the number of inversions 'n' in the list 'L'
-; <lista> := ()
-;         := (<number> <lista>)
+; <list> := ()
+;         := (<number> <list>)
 
 (define inversions (lambda (l)
 		    (letrec(
@@ -353,6 +357,28 @@
 ; (filter-acum 1 10 + 0 even?)
 ; (filter-acum 1 10 + 1 number?)
 
+; Exercise 15
+; Contract: Tree -> L
+; Purpose: returns the count the number of even and odd numbers in a binary tree and returns a 
+; list with the number of even numbers and the number of even numbers.
+; <bynary-tree> := (empty-tree) empty
+;        		  := (nodo) number <bynary-tree> <bynary-tree>
+
+(define count-odd-and-even
+	(lambda(arbol)
+		(cond
+			[(null? arbol) '(0 0)]
+			[(not (pair? arbol))
+				(if(odd? arbol) '(0 1) '(1 0))]
+			[else (zip + (count-odd-and-even (car arbol))
+					(count-odd-and-even (cdr arbol)))]
+		)
+	)
+)
+
+;;; (count-odd-and-even '(14 (7 () (12 () ())) (26 (20 (17 () ())()) (31 () ()))))
+;;; (count-odd-and-even '((7 () (12 () ())) (26 (20 (17 () ())()) (31 () ()))))
+;;; (count-odd-and-even '((10 (8 () ()) (15 () ())) (4 (6 () ()) (22 () ()))))
 
 ; Exercise 16
 ; Contract: L -> N
