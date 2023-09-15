@@ -357,6 +357,7 @@
 ;(operate (list *) '(4 5))
 ;(operate (list + - *) '(0 1 2 3 4 5))
 
+
 ; Exercise 14
 ; Contract: n, bst -> list
 ; Propose: Return a list with the path to take, as indicated by a binary tree, to reach the received number n.
@@ -364,33 +365,21 @@
 ; <binaryTree> := ( ́emptyTree) empty
 ;                 := (nodo) number <binaryTree> < binaryTree>
 
-(define path (lambda (n bst)
-                (if (< n (car bst))
-                    (if (number? (cadr bst))
-                        (if (= n (cadr bst))
-                            (cons 'left empty)
-                            #f
-                          )
-                        (if (= n ( car (cadr bst)) )
-                           (cons 'left empty)
-                           ( cons 'left (path n (cadr bst)) )
-                         )
-                      )
-                    (if (number? (caddr bst))
-                        (if (= n (caddr bst))
-                            (cons 'right empty)
-                            #f
-                          )
 
-                        (if (= n ( car (caddr bst)) )
-                           (cons 'right empty)
-                           ( cons 'right (path n (caddr bst)) )
-                         )
-                      )
-    )))
+(define path (lambda (n bst)
+                    
+  (cond
+    [(null? bst) empty] 
+    [(= n (car bst)) '()] 
+    [(< n (car bst)) (cons 'left (path n (cadr bst)))]
+    [else (cons 'right (path n (caddr bst)))]
+  )))
 
 ; Proofs
-(path 17 '(14 (7 () (12 () ()))(26 (20 (17 () ())())(31 () ()))))
+;(path 17 '(14 (7 () (12 () ()))(26 (20 (17 () ())())(31 () ()))))
+;(path 14 '(14 () ()))
+;(path 7 '(8 (3 () (1 () (6 (4 () ()) (7 () ())))) (10 () (14 (13 () ()) ())) ))
+;(path 13 '(8 (3 () (1 () (6 (4 () ()) (7 () ())))) (10 () (14 (13 () ()) ())) ))
 
 
 ; Exercise 16
