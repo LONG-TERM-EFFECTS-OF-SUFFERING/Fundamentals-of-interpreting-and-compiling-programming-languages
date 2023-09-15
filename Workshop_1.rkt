@@ -421,10 +421,10 @@
   (lambda (mat vec)
     (letrec(
           (prod-scalar-vector
-            (lambda (vec1 auxvec)
+            (lambda (vec1 aux)
               (cond
-                [(or (null? vec1) (null? auxvec)) empty]
-                [else (cons (* (car vec1) (car auxvec)) (prod-scalar-vector (cdr vec1) (cdr auxvec)))]
+                [(or (null? vec1) (null? aux)) empty]
+                [else (cons (* (car vec1) (car aux)) (prod-scalar-vector (cdr vec1) (cdr aux)))]
               )))
         )
       (if (null? mat)
@@ -436,7 +436,7 @@
 ;Proofs
 ;(prod-scalar-matriz '((1 1) (2 2)) '(2 3))
 ;(prod-scalar-matriz '((1 1) (2 2) (3 3)) '(2 3))
-;
+;(prod-scalar-matriz '((2 2) (1 3) (6 4)) '(3 3))
 
 ; Exercise 18
 ; Contract: N -> L
