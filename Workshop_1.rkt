@@ -408,6 +408,36 @@
 ; (Operar-binarias '( (5 multiplica 3) multiplica (6 multiplica 7)))
 
 
+; Exercise 17
+; Contract: mat, vec -> List
+; Purpose: Return the result of performing matrix-vector multiplication
+; <matrix> := ()
+;          := (<int-list> <matrix>)
+;
+; <int-list> := ()
+;            := (<int> <int-list>)
+
+(define prod-scalar-matrix
+  (lambda (mat vec)
+    (letrec(
+          (prod-scalar-vector
+            (lambda (vec1 auxvec)
+              (cond
+                [(or (null? vec1) (null? auxvec)) empty]
+                [else (cons (* (car vec1) (car auxvec)) (prod-scalar-vector (cdr vec1) (cdr auxvec)))]
+              )))
+        )
+      (if (null? mat)
+          empty
+          (cons (prod-scalar-vector (car mat) vec) (prod-scalar-matrix (cdr mat) vec))
+      ))
+))
+
+;Proofs
+;(prod-scalar-matriz '((1 1) (2 2)) '(2 3))
+;(prod-scalar-matriz '((1 1) (2 2) (3 3)) '(2 3))
+;
+
 ; Exercise 18
 ; Contract: N -> L
 ; Purpose: returns the row "N" of Pascal's triangle.
