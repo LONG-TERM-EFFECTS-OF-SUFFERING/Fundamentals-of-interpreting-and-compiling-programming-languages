@@ -385,8 +385,8 @@
 ; Contract: n, bst -> list
 ; Propose: Return a list with the path to take, as indicated by a binary tree, to reach the received number n.
 ; If the number is in the root node, return an empty list.
-; <binaryTree> := ( ́emptyTree) empty
-;                 := (nodo) number <binaryTree> < binaryTree>
+; <binaryTree> := (EmptyTree) empty
+;              := (nodo) number <binaryTree> < binaryTree>
 
 (define path (lambda (n bst)
                     
