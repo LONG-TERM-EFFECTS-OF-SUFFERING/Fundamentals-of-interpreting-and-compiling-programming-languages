@@ -417,7 +417,7 @@
 ; <int-list> := ()
 ;            := (<int> <int-list>)
 
-(define prod-scalar-matrix
+(define prod-scalar-matriz
   (lambda (mat vec)
     (letrec(
           (prod-scalar-vector
@@ -429,7 +429,7 @@
         )
       (if (null? mat)
           empty
-          (cons (prod-scalar-vector (car mat) vec) (prod-scalar-matrix (cdr mat) vec))
+          (cons (prod-scalar-vector (car mat) vec) (prod-scalar-matriz (cdr mat) vec))
       ))
 ))
 
