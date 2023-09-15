@@ -337,7 +337,6 @@
 ; (zip * '(11 5 6) '(10 9 8))
 ; (zip - '(2 3) '(5 4))
 
-
 ; Exercise 12
 ; Contract: a, b, F, acum, filter -> n
 ; Propose: Apply the binary function F to all elements within
@@ -356,6 +355,53 @@
 ; (filter-acum 1 10 + 0 odd?)
 ; (filter-acum 1 10 + 0 even?)
 ; (filter-acum 1 10 + 1 number?)
+
+; Exercise 13
+; Contract: lrators, lrands -> n
+; Propose: Return the result of successively applying the operations
+; in 'lrators' to the values in 'lrands'.
+; <list> := (<int> <list>)
+
+(define operate
+  (lambda (Irators Irands)(
+    letrec(
+        (explore(
+           lambda (l)(
+             if (null? l) 0 (+ 1 (explore(cdr l))))))
+      )
+     (if (< (explore Irands) (explore Irators)) 'error
+        (if (null? (cdr Irators))
+        ((car Irators) (car Irands) (cadr Irands))
+        ( operate (cdr Irators) (cons ((car Irators) (car Irands) (cadr Irands)) (cddr Irands)))))
+  )))
+
+
+;Proofs
+;(operate (list + * + - *) '(1 2 8 4 11 6))
+;(operate (list *) '(4 5))
+;(operate (list + - *) '(0 1 2 3 4 5))
+
+; Exercise 14
+; Contract: n, bst -> list
+; Propose: Return a list with the path to take, as indicated by a binary tree, to reach the received number n.
+; If the number is in the root node, return an empty list.
+; <binaryTree> := ( ́emptyTree) empty
+;                 := (nodo) number <binaryTree> < binaryTree>
+
+(define path (lambda (n bst)
+                    
+  (cond
+    [(null? bst) empty] 
+    [(= n (car bst)) '()] 
+    [(< n (car bst)) (cons 'left (path n (cadr bst)))]
+    [else (cons 'right (path n (caddr bst)))]
+  )))
+
+; Proofs
+;(path 17 '(14 (7 () (12 () ()))(26 (20 (17 () ())())(31 () ()))))
+;(path 14 '(14 () ()))
+;(path 7 '(8 (3 () (1 () (6 (4 () ()) (7 () ())))) (10 () (14 (13 () ()) ())) ))
+;(path 13 '(8 (3 () (1 () (6 (4 () ()) (7 () ())))) (10 () (14 (13 () ()) ())) ))
 
 ; Exercise 15
 ; Contract: Tree -> L
@@ -405,6 +451,36 @@
 ; (Operar-binarias '( (2 multiplica (4 suma 1)) multiplica ((2 multiplica 4) resta 1) ))
 ; (Operar-binarias '( (5 multiplica 3) multiplica (6 multiplica 7)))
 
+
+; Exercise 17
+; Contract: mat, vec -> List
+; Purpose: Return the result of performing matrix-vector multiplication
+; <matrix> := ()
+;          := (<int-list> <matrix>)
+;
+; <int-list> := ()
+;            := (<int> <int-list>)
+
+(define prod-scalar-matriz
+  (lambda (mat vec)
+    (letrec(
+          (prod-scalar-vector
+            (lambda (vec1 aux)
+              (cond
+                [(or (null? vec1) (null? aux)) empty]
+                [else (cons (* (car vec1) (car aux)) (prod-scalar-vector (cdr vec1) (cdr aux)))]
+              )))
+        )
+      (if (null? mat)
+          empty
+          (cons (prod-scalar-vector (car mat) vec) (prod-scalar-matriz (cdr mat) vec))
+      ))
+))
+
+;Proofs
+;(prod-scalar-matriz '((1 1) (2 2)) '(2 3))
+;(prod-scalar-matriz '((1 1) (2 2) (3 3)) '(2 3))
+;(prod-scalar-matriz '((2 2) (1 3) (6 4)) '(3 3))
 
 ; Exercise 18
 ; Contract: N -> L
