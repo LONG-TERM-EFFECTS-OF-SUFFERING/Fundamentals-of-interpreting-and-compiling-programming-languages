@@ -1,3 +1,9 @@
+; Calderón Prieto Brandon (2125874)
+; Corrales Carlos Daniel (2122878)
+; Melo Burbano Deisy (2041790)
+
+#lang eopl
+
 ; -------------------------------------------------------------------------- ;
 ;                              1. SAT INSTANCES                              ;
 ; -------------------------------------------------------------------------- ;
@@ -79,7 +85,6 @@
 		caddr fnc-list
 	)
 ))
-
 
 (define or-list->rand1 (
 	lambda (or-list) (
@@ -214,7 +219,7 @@
 			(boolean-var-exp (value) (
 				if (> value 0)
 					(nth-element proposal (- value 1))
-					(* -1 (nth-element proposal (- value 1)))
+					(not (nth-element proposal (- (* -1 value) 1)))
 			))
 			(or-exp (rand1 rand2) (or
 				(evaluate-proposal rand1 proposal)
@@ -224,3 +229,89 @@
 				(evaluate-proposal rand2 proposal)))
 	)
 ))
+
+(define all-proposals (
+	lambda (vars) (
+		letrec (
+			(generate-all-proposals (
+				lambda (vars proposals) (
+					letrec (
+						(generate-new-permutation (
+							lambda (list1 list2) (
+								letrec (
+										(insert-in-all (
+											lambda (element list) (
+												if (null? list)
+													empty
+													(cons (cons element (car list)) (insert-in-all element (cdr list)))
+											)
+										))
+									)
+									(if (null? list1)
+										empty
+										(append (insert-in-all (car list1) list2) (generate-new-permutation (cdr list1) list2)))
+							)
+						))
+					)
+					(cond
+						[(= vars 1) proposals]
+						[else (generate-all-proposals (- vars 1) (generate-new-permutation '(#t #f) proposals))])
+				)
+			))
+		)
+		(generate-all-proposals vars '((#t) (#f)))
+	)
+))
+
+(define evaluate-sta (
+	lambda (exp) (
+		cases fnc exp
+			(fnc-exp (vars bolean-operation) (
+				letrec (
+					(test-proposals (
+						lambda (fnc-exp proposals) (
+							cond
+								[(empty? proposals) (format "unsatisfactory ~s" proposals)]
+								[(evaluate-proposal bolean-operation (car proposals)) (format "satisfactory ~s" (car proposals))]
+								[else (test-proposals fnc-exp (cdr proposals))]
+						)
+					))
+				)
+				(test-proposals bolean-operation (all-proposals vars))
+			))
+	)
+))
+
+
+; ------------------------- EXAMPLES STA EVALUATION ------------------------ ;
+
+; FNC 4 ((1 OR -2 OR 3 OR 4) AND (-2 OR 3) AND (-1 OR -2 OR -3) AND (3 OR 4) AND 2)
+
+(define test1 (fnc-exp 4
+	(
+		and-exp
+			(and-exp
+				(and-exp
+					(or-exp (or-exp (or-exp (boolean-var-exp 1) (boolean-var-exp -2)) (boolean-var-exp 3)) (boolean-var-exp 4))
+					(or-exp (boolean-var-exp -2) (boolean-var-exp 3)))
+				(and-exp
+					(or-exp (or-exp (boolean-var-exp -1) (boolean-var-exp -2)) (boolean-var-exp -3))
+					(or-exp (boolean-var-exp 3) (boolean-var-exp 4))))
+			(boolean-var-exp 2)
+	)
+))
+
+; FNC 2 ((1 OR 2) AND -1 and -2)
+
+(define test2 (fnc-exp 2
+	(
+		and-exp
+			(and-exp
+				(or-exp (boolean-var-exp 1) (boolean-var-exp 2))
+				(boolean-var-exp -1))
+			(boolean-var-exp -2)
+	)
+))
+
+(evaluate-sta test1)
+(evaluate-sta test2)
