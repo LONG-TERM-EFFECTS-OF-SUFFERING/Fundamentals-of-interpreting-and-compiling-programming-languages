@@ -5,6 +5,18 @@
 #lang eopl
 
 ; -------------------------------------------------------------------------- ;
+;                             AUXILIAR FUNCTIONS                             ;
+; -------------------------------------------------------------------------- ;
+
+(define nth-element (
+	lambda (list n) (
+		cond
+			[(zero? n) (car list)]
+			[else (nth-element (cdr list) (- n 1))]
+	)
+))
+
+; -------------------------------------------------------------------------- ;
 ;                              1. SAT INSTANCES                              ;
 ; -------------------------------------------------------------------------- ;
 
@@ -192,7 +204,7 @@
 (define unparse-fnc-expression (
 	lambda (exp) (
 		cases fnc exp
-			(fnc-exp (vars bolean-operation) (list 'FNC vars (unparse-logic_operation-expression bolean-operation)))
+			(fnc-exp (vars bolean-operation) (fnc-list vars (unparse-logic_operation-expression bolean-operation)))
 	)
 ))
 
@@ -269,11 +281,11 @@
 			(fnc-exp (vars bolean-operation) (
 				letrec (
 					(test-proposals (
-						lambda (fnc-exp proposals) (
+						lambda (bolean-operation proposals) (
 							cond
 								[(empty? proposals) (format "unsatisfactory ~s" proposals)]
 								[(evaluate-proposal bolean-operation (car proposals)) (format "satisfactory ~s" (car proposals))]
-								[else (test-proposals fnc-exp (cdr proposals))]
+								[else (test-proposals bolean-operation (cdr proposals))]
 						)
 					))
 				)
