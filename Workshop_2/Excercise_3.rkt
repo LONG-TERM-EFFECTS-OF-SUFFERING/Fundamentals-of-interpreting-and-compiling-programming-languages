@@ -9,80 +9,6 @@
 (require "Exercise_1.rkt")
 ;;; (require "Exercise_2.rkt")
 
-; ------------------------------ CONSTRUCTORS ------------------------------ ;
-
-; Contract: N, L -> L
-; Purpose: returns the list-based representation of an FNC with a number of
-; "var" variables and an AND "and-operation" that contains the the clauses.
-
-(define fnc-list (
-	lambda (vars and-operation) (
-		list 'FNC vars and-operation
-	)
-))
-
-
-; Contract: L -> L
-; Purpose: returns the list representation of an AND that contains the clauses
-; "clauses".
-
-(define and-list (
-	lambda (clauses) (
-		list 'AND clauses
-	)
-))
-
-
-; Contract: L -> L
-; Purpose: returns the list representation of an OR that contains the vars
-; "vars".
-
-(define or-list (
-	lambda (vars) (
-		list 'OR vars
-	)
-))
-
-; ------------------------------- PREDICATES ------------------------------- ;
-
-; Contract: L -> B
-; Purpose: returns "#t" if the expression "exp" is a fnc-list, "#f" otherwise.
-
-(define fnc-list? (
-	lambda (exp) (
-		eqv? (car exp) 'FNC
-	)
-))
-
-; Contract: L -> B
-; Purpose: returns "#t" if the expression "exp" is a or-list, "#f" otherwise.
-
-(define or-list? (
-	lambda (exp) (
-		eqv? (car exp) 'OR
-	)
-))
-
-; ------------------------------- EXTRACTORS ------------------------------- ;
-
-; Contract: L -> L
-; Purpose: returns the clauses in the and-list "and-list".
-
-(define and-list->clauses (
-	lambda (and-list) (
-		cadr and-list
-	)
-))
-
-; Contract: L -> L
-; Purpose: returns the vars in the or-list "or-list".
-
-(define or-list->vars (
-	lambda (or-list) (
-		cadr or-list
-	)
-))
-
 ; --------------------------- AUXILIAR FUNCTIONS --------------------------- ;
 
 ; Contract: transform-function (unary function), L -> L
@@ -191,9 +117,9 @@
   	lambda (exp)
     	(cond
       		((fnc-list? exp)
-      			(let ((vars (cadr exp))
-            		(bolean-operation (caddr exp))
-            		(proposals (all-proposals (cadr exp))))
+      			(let ((vars (fnc-list->vars  exp))
+            		(bolean-operation (fnc-list->and-operation exp))
+            		(proposals (all-proposals (fnc-list->vars exp))))
         				(letrec ((test-proposals
                   			(lambda (proposals)
                     			(cond
