@@ -68,6 +68,8 @@
 	)
 ))
 
+; Contract: L, L -> B
+; Purpose: returns #t or #f if it satisfies for all possible permutations of truth values ​​of the variables
 (define evaluate-exp (
 	lambda (exp proposal) (
 		letrec (
@@ -93,6 +95,8 @@
 	)
 ))
 
+; Contract: L, L -> B
+; Purpose: If all clauses are true, the function returns #t, #f otherwise
 (define evaluate-proposal (
 	lambda (and-list proposal) (
 		letrec (
@@ -113,7 +117,10 @@
 	)
 ))
 
-(define evaluate-sat (
+; Contract: L -> B
+; Purpose: Evaluates all permutations one by one, if it finds at least one that satisfies the formula, 
+; returns "satisfactory" along with that permutation. If no satisfactory permutation is found, returns "unsatisfactory"
+(define EVALUARSAT (
   	lambda (exp)
     	(cond
       		((fnc-list? exp)
@@ -143,7 +150,7 @@
     (or-list (list 2))
   ))
 ))
-(evaluate-sat prueba1)
+(EVALUARSAT prueba1)
 
 (define prueba2 (fnc-list 2
   (and-list (list
@@ -152,4 +159,4 @@
     (or-list (list -2))
   ))
 ))
-(evaluate-sat prueba2)
+(EVALUARSAT prueba2)
