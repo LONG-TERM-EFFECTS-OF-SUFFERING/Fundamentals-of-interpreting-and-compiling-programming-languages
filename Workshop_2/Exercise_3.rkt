@@ -2,12 +2,9 @@
 ; Corrales Carlos Daniel (2122878)
 ; Melo Burbano Deisy (2041790)
 
-#lang racket
-(require (except-in eopl #%module-begin))
-(provide (all-from-out eopl))
-(provide #%module-begin)
+#lang eopl
 (require "Exercise_1.rkt")
-;;; (require "Exercise_2.rkt")
+
 
 ; --------------------------- AUXILIAR FUNCTIONS --------------------------- ;
 
@@ -118,27 +115,27 @@
 ))
 
 ; Contract: L -> B
-; Purpose: Evaluates all permutations one by one, if it finds at least one that satisfies the formula, 
+; Purpose: Evaluates all permutations one by one, if it finds at least one that satisfies the formula,
 ; returns "satisfactory" along with that permutation. If no satisfactory permutation is found, returns "unsatisfactory"
 (define EVALUARSAT (
-  	lambda (exp)
-    	(cond
-      		((fnc-list? exp)
-      			(let ((vars (fnc-list->vars  exp))
-            		(bolean-operation (fnc-list->and-operation exp))
-            		(proposals (all-proposals (fnc-list->vars exp))))
-        				(letrec ((test-proposals
-                  			(lambda (proposals)
-                    			(cond
-                       				[(empty? proposals) (format "unsatisfactory ~s" proposals)]
-                       				[(evaluate-proposal bolean-operation (car proposals)) (format "satisfactory ~s" (car proposals))]
-                       				[else (test-proposals (cdr proposals))]
-                       			)
-                   			)))
-        		(test-proposals proposals)))
-       		)
-      	)
-    )
+	lambda (exp)
+		(cond
+			((fnc-list? exp)
+				(let ((vars (fnc-list->vars  exp))
+					(bolean-operation (fnc-list->and-operation exp))
+					(proposals (all-proposals (fnc-list->vars exp))))
+						(letrec ((test-proposals
+							(lambda (proposals)
+								(cond
+									[(empty? proposals) (format "unsatisfactory ~s" proposals)]
+									[(evaluate-proposal bolean-operation (car proposals)) (format "satisfactory ~s" (car proposals))]
+									[else (test-proposals (cdr proposals))]
+								)
+							)))
+				(test-proposals proposals)))
+			)
+		)
+	)
 )
 
 (define prueba1 (fnc-list 4
