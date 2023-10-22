@@ -63,6 +63,8 @@
 	(text (letter (arbno (or letter digit "?" ":"))) string)
 	(number (digit (arbno digit)) number)
 	(number ("-" digit (arbno digit)) number)
+	(number ( digit (arbno digit) "." digit (arbno digit)) number)
+        (number ( "-" digit (arbno digit) "." digit (arbno digit)) number)
 ))
 
 
@@ -111,6 +113,11 @@
 	sllgen:make-string-scanner lexica grammar
 ))
 
+(define interpretador (sllgen:make-rep-loop "-->"
+                                            (lambda (pgm) (eval-program pgm))
+                                            (sllgen:make-stream-parser
+                                              lexica
+                                              grammar)))
 ; -------------------------------------------------------------------------- ;
 ;                                ENVIRONMENTS                                ;
 ; -------------------------------------------------------------------------- ;
