@@ -426,3 +426,16 @@
 
        }
 "))
+; ------------------------------------(d)----------------------------------- ;
+;procedimiento que realiza la resta de dos dumeros implementando el predecesor
+
+(eval-program (scan&parse "declarar (
+      @restar= procedimiento (@n, @p) haga
+                     letrec {
+                       @res(@m, @j)= Si @m entonces evaluar @res (sub1(@j), sub1(@m)) finEval sino @j finSI} evaluar @res (@n,@p) finEval
+                  finProc
+     ) { 
+         evaluar @restar (10, 3) finEval 
+
+       }
+"))
