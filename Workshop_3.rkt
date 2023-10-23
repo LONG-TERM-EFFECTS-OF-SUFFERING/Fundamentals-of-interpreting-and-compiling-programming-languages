@@ -375,7 +375,7 @@
 
       @radio=2.5;
 
-      @areaCirculo= procedimiento (@radio) haga ((3.1416 * @radio)*@radio) finProc
+      @areaCirculo= procedimiento (@radio) haga ((3.14159265 * @radio)*@radio) finProc
 
      ) { 
 
