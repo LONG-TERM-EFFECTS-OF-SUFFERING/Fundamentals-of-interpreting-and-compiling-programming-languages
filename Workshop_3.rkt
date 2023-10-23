@@ -370,6 +370,7 @@
 
 
 ; ------------------------------------(a)----------------------------------- ;
+;procedimiento que calcula el área de un circulo en base a una variable @radio
 
 (eval-program (scan&parse "declarar (
 
@@ -385,6 +386,7 @@
 "))
 
 ; ------------------------------------(b)----------------------------------- ;
+;Procedimiento que halla el factorial de un número @n = 5
 
 (eval-program (scan&parse "declarar (
       @n=5;
@@ -398,6 +400,8 @@
        }
 "))
 
+;Procedimiento que halla el factorial de un número @n = 10
+
 (eval-program (scan&parse "declarar (
       @n=10;
       @factorial= procedimiento (@n) haga
@@ -410,6 +414,7 @@
        }
 "))
 ; ------------------------------------(c)----------------------------------- ;
+;Procedimiento que realiza la suma de dos números implementando el sucesor y el predecesor 
 
 (eval-program (scan&parse "declarar (
       @sumar= procedimiento (@n, @p) haga
