@@ -369,4 +369,55 @@
 ; -------------------------------------------------------------------------- ;
 
 
-; ------------------------------------ 1 ----------------------------------- ;
+; ------------------------------------(a)----------------------------------- ;
+
+(eval-program (scan&parse "declarar (
+
+      @radio=2.5;
+
+      @areaCirculo= procedimiento (@radio) haga ((3.1416 * @radio)*@radio) finProc
+
+     ) { 
+
+         evaluar @areaCirculo (@radio) finEval  
+
+       }
+"))
+
+; ------------------------------------(b)----------------------------------- ;
+
+(eval-program (scan&parse "declarar (
+      @n=5;
+      @factorial= procedimiento (@n) haga
+                     letrec {
+                       @fact(@m)= Si @m entonces ( @m * evaluar @fact (sub1(@m)) finEval) sino 1 finSI} evaluar @fact (@n) finEval
+                  finProc
+     ) { 
+         evaluar @factorial(@n) finEval  
+
+       }
+"))
+
+(eval-program (scan&parse "declarar (
+      @n=10;
+      @factorial= procedimiento (@n) haga
+                     letrec {
+                       @fact(@m)= Si @m entonces ( @m * evaluar @fact (sub1(@m)) finEval) sino 1 finSI} evaluar @fact (@n) finEval
+                  finProc
+     ) { 
+         evaluar @factorial(@n) finEval  
+
+       }
+"))
+; ------------------------------------(c)----------------------------------- ;
+
+(eval-program (scan&parse "declarar (
+      @sumar= procedimiento (@n, @p) haga
+                     letrec {
+                       @sum(@m)= Si @m entonces add1(evaluar @sum (sub1(@m)) finEval) sino @p finSI} evaluar @sum (@n) finEval
+                  finProc
+     ) { 
+         evaluar @sumar (4, 5) finEval 
+
+       }
+"))
