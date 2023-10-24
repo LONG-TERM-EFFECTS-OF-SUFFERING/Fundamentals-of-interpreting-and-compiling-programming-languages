@@ -63,8 +63,8 @@
 	(text (letter (arbno (or letter digit "?" ":"))) string)
 	(number (digit (arbno digit)) number)
 	(number ("-" digit (arbno digit)) number)
-	(number ( digit (arbno digit) "." digit (arbno digit)) number)
-        (number ( "-" digit (arbno digit) "." digit (arbno digit)) number)
+	(number (digit (arbno digit) "." digit (arbno digit)) number)
+	(number ( "-" digit (arbno digit) "." digit (arbno digit)) number)
 ))
 
 
@@ -113,16 +113,19 @@
 	sllgen:make-string-scanner lexica grammar
 ))
 
-(define interpretador (sllgen:make-rep-loop "-->"
-                                            (lambda (pgm) (eval-program pgm))
-                                            (sllgen:make-stream-parser
-                                              lexica
-                                              grammar)))
+(define interpreter (
+	sllgen:make-rep-loop  "--> " (lambda (pgm) (eval-program  pgm)) (sllgen:make-stream-parser lexica grammar)
+))
+
 ; -------------------------------------------------------------------------- ;
 ;                                ENVIRONMENTS                                ;
 ; -------------------------------------------------------------------------- ;
 
 ; -------------------------------- AUXILIAR -------------------------------- ;
+
+; Contract: list, number -> anything
+; Purpose: searches for the nth element in the given list.
+; Returns the nth element of a given list.
 
 (define nth-element (
 	lambda (list n) (
@@ -131,6 +134,12 @@
 			[else (nth-element (cdr list) (- n 1))]
 	)
 ))
+
+
+; Contract: anything, list -> number or boolean
+; Purpose: searches for the index of a element in the given list.
+; Returns the index of the first occurrence the element "element" in the list "list".
+; If the element is not found in the list, returns #f.
 
 (define index-of (
 	lambda (element list) (
@@ -166,6 +175,11 @@
 
 (define scheme-value? (lambda (anything) #t))
 
+
+; Contract: environment, var -> expression
+; Purpose: searches for a variable in the given environment.
+; If the variable is not found, it raises an error.
+; Returns the value of the variable.
 
 (define buscar-variable (
 	lambda (env var) (
@@ -217,6 +231,11 @@
 ))
 
 
+; Contract: procedure, arguments -> number or text
+; Purpose: apply the given procedure to the given arguments.
+; Returns the evaluation of its body in an environment extended
+; with the closure's identifiers bound to the given arguments.
+
 (define apply-procedure (
 	lambda (proc arguments) (
 		cases procVal proc
@@ -226,12 +245,20 @@
 ))
 
 
+; Contract: scheme value -> boolean
+; Purpose: determines whether a given value is true or false.
+; Returns #t if it is not equal to 0, #f otherwise.
+
 (define valor-verdad? (
 	lambda (value) (
 		not (zero? value)
 	)
 ))
 
+
+; Contract: program, environment -> number or text
+; Purpose: evaluates a program by calling eval-expression on its body with an initial environment.
+; Returns the result of evaluating the program's body expression.
 
 (define eval-program (
 	lambda (pgm) (
@@ -241,12 +268,21 @@
 ))
 
 
+; Contract: lsit of expressions, environment -> list of expressions
+; Purpose: evaluates a list of expressions in the given environment.
+; Returns the list with each expression in "expressions" evaluated
+; with "eval-expression".
+
 (define eval-expressions (
 	lambda (expressions env) (
 		map (lambda (expression) (eval-expression expression env)) expressions
 	)
 ))
 
+
+; Contract: expression, environment -> number or text
+; Purpose: evaluates an expression in the given environment.
+; Returns the result of evaluating the expression "expression".
 
 (define eval-expression (
 	lambda (exp env) (
@@ -304,6 +340,10 @@
 ))
 
 
+; Contract: primitiva-unaria, text or number -> number
+; Purpose: apply a unary primitive operation to a single operand.
+; Returns the result of the operation applied to the operand.
+
 (define apply-unary-primitive (
 	lambda (rator rand) (
 		cases primitiva-unaria rator
@@ -313,129 +353,140 @@
 	)
 ))
 
+; Contract: text or number, primitiva-binaria, text or number -> number or text
+; Purpose: apply the given binary primitive operation to the two given operands.
+; Returns the result of the operation applied to the two operands.
 
-(define apply-binary-primitive (
-	lambda (rand1 rator rand2) (
-		cases primitiva-binaria rator
+(define apply-binary-primitive
+	(lambda (rand1 rator rand2)
+		(cases primitiva-binaria rator
 			(primitiva-suma () (+ rand1 rand2))
 			(primitiva-resta () (- rand1 rand2))
 			(primitiva-div () (/ rand1 rand2))
 			(primitiva-multi () (* rand1 rand2))
-			(primitiva-concat () (string-append rand1 rand2))
-	)
-))
+			(primitiva-concat () (string-append rand1 rand2)))))
 
 ; -------------------------------------------------------------------------- ;
 ;                                   TESTING                                  ;
 ; -------------------------------------------------------------------------- ;
 
-(eval-program (scan&parse "
-	// Si (2 + 3) entonces 2 sino 3 finSI
-	// Si (longitud(@d) ~ 4) entonces 2 sino 3 finSI
+; (eval-program (scan&parse "
+; 	// Si (2 + 3) entonces 2 sino 3 finSI
+; 	// Si (longitud(@d) ~ 4) entonces 2 sino 3 finSI
 
-	// declarar (@x = 2; @y = 3; @a = 7) {
-	// 	(@a + (@x ~ @y))
-	// }
+; 	// declarar (@x = 2; @y = 3; @a = 7) {
+; 	// 	(@a + (@x ~ @y))
+; 	// }
 
-	// declarar (@x = 2; @y = 3; @a = 7) {
-	// 	(@a + @b)
-	// }
+; 	// declarar (@x = 2; @y = 3; @a = 7) {
+; 	// 	(@a + @b)
+; 	// }
 
-	// declarar (
-	// 	@x = 2;
-	// 	@y = 3;
-	// 	@a = procedimiento (@x, @y, @z) haga ((@x + @y) + @z) finProc
-	// ) {
-	// 	evaluar @a (1 , 2, @x) finEval
-	// }
+; 	// declarar (
+; 	// 	@x = 2;
+; 	// 	@y = 3;
+; 	// 	@a = procedimiento (@x, @y, @z) haga ((@x + @y) + @z) finProc
+; 	// ) {
+; 	// 	evaluar @a (1 , 2, @x) finEval
+; 	// }
 
-	// declarar (
-	// 	@x = procedimiento (@a, @b) haga ((@a * @a) + (@b * @b)) finProc;
-	// 	@y = procedimiento (@x, @y) haga (@x + @y) finProc
-	// ) {
-	// 	(evaluar @x (1,2) finEval + evaluar @y (2,3) finEval)
-	// }
+; 	// declarar (
+; 	// 	@x = procedimiento (@a, @b) haga ((@a * @a) + (@b * @b)) finProc;
+; 	// 	@y = procedimiento (@x, @y) haga (@x + @y) finProc
+; 	// ) {
+; 	// 	(evaluar @x (1,2) finEval + evaluar @y (2,3) finEval)
+; 	// }
 
-	// declarar (
-	// 	@x = Si (@a * @b) entonces (@d concat @e) sino longitud((@d concat @e)) finSI;
-	// 	@y = procedimiento (@x, @y) haga (@x + @y) finProc
-	// ) {
-	// 	(longitud (@x) * evaluar @y (2,3) finEval)
-	// }
-"))
+; 	// declarar (
+; 	// 	@x = Si (@a * @b) entonces (@d concat @e) sino longitud((@d concat @e)) finSI;
+; 	// 	@y = procedimiento (@x, @y) haga (@x + @y) finProc
+; 	// ) {
+; 	// 	(longitud (@x) * evaluar @y (2,3) finEval)
+; 	// }
+; "))
 
 ; -------------------------------------------------------------------------- ;
 ;                                  QUESTIONS                                 ;
 ; -------------------------------------------------------------------------- ;
 
 
-; ------------------------------------(a)----------------------------------- ;
-;procedimiento que calcula el área de un circulo en base a una variable @radio
+; ------------------------------------ A ----------------------------------- ;
 
-(eval-program (scan&parse "declarar (
+; Procedimiento que calcula el área de un circulo en base a una variable @radio
 
-      @radio=2.5;
-
-      @areaCirculo= procedimiento (@radio) haga ((3.14159265 * @radio)*@radio) finProc
-
-     ) { 
-
-         evaluar @areaCirculo (@radio) finEval  
-
-       }
+(eval-program (scan&parse "
+	declarar (
+		@radio = 2.5;
+		@areaCirculo = procedimiento (@radio) haga ((3.14159265 * @radio) * @radio) finProc
+	) {
+		evaluar @areaCirculo (@radio) finEval
+	}
 "))
 
-; ------------------------------------(b)----------------------------------- ;
-;Procedimiento que halla el factorial de un número @n = 5
+; ------------------------------------ B ----------------------------------- ;
 
-(eval-program (scan&parse "declarar (
-      @n=5;
-      @factorial= procedimiento (@n) haga
-                     letrec {
-                       @fact(@m)= Si @m entonces ( @m * evaluar @fact (sub1(@m)) finEval) sino 1 finSI} evaluar @fact (@n) finEval
-                  finProc
-     ) { 
-         evaluar @factorial(@n) finEval  
+; Procedimiento que halla el factorial de un número @n = 5
 
-       }
+(eval-program (scan&parse "
+	declarar (
+		@n = 5;
+		@factorial = procedimiento (@n) haga
+						letrec {
+							@fact(@m)= Si @m entonces (@m * evaluar @fact (sub1(@m)) finEval) sino 1 finSI
+						}
+						evaluar @fact(@n) finEval
+					finProc
+	) {
+		evaluar @factorial(@n) finEval
+	}
 "))
 
-;Procedimiento que halla el factorial de un número @n = 10
+; Procedimiento que halla el factorial de un número @n = 10
 
-(eval-program (scan&parse "declarar (
-      @n=10;
-      @factorial= procedimiento (@n) haga
-                     letrec {
-                       @fact(@m)= Si @m entonces ( @m * evaluar @fact (sub1(@m)) finEval) sino 1 finSI} evaluar @fact (@n) finEval
-                  finProc
-     ) { 
-         evaluar @factorial(@n) finEval  
-
-       }
+(eval-program (scan&parse "
+	declarar (
+		@n = 10;
+		@factorial = procedimiento (@n) haga
+						letrec {
+							@fact(@m)= Si @m entonces (@m * evaluar @fact (sub1(@m)) finEval) sino 1 finSI
+						}
+						evaluar @fact(@n) finEval
+					finProc
+	) {
+		evaluar @factorial(@n) finEval
+	}
 "))
-; ------------------------------------(c)----------------------------------- ;
-;Procedimiento que realiza la suma de dos números implementando el sucesor y el predecesor 
 
-(eval-program (scan&parse "declarar (
-      @sumar= procedimiento (@n, @p) haga
-                     letrec {
-                       @sum(@m)= Si @m entonces add1(evaluar @sum (sub1(@m)) finEval) sino @p finSI} evaluar @sum (@n) finEval
-                  finProc
-     ) { 
-         evaluar @sumar (4, 5) finEval 
+; ------------------------------------ C ----------------------------------- ;
 
-       }
+; Procedimiento que realiza la suma de dos números implementando el sucesor y el predecesor
+
+(eval-program (scan&parse "
+	declarar (
+		@sumar = procedimiento (@n, @p) haga
+					letrec {
+						@sum(@m) = Si @m entonces add1(evaluar @sum(sub1(@m)) finEval) sino @p finSI
+					}
+					evaluar @sum(@n) finEval
+				finProc
+	) {
+		evaluar @sumar (4, 5) finEval
+	}
 "))
-; ------------------------------------(d)----------------------------------- ;
-;procedimiento que realiza la resta de dos dumeros implementando el predecesor
 
-(eval-program (scan&parse "declarar (
-      @restar= procedimiento (@n, @p) haga
-                     letrec {
-                       @res(@m, @j)= Si @m entonces evaluar @res (sub1(@j), sub1(@m)) finEval sino @j finSI} evaluar @res (@n,@p) finEval
-                  finProc
-     ) { 
-         evaluar @restar (10, 3) finEval 
+; ------------------------------------ D ----------------------------------- ;
 
-       }
+; Procedimiento que realiza la resta de dos dumeros implementando el predecesor
+
+(eval-program (scan&parse "
+	declarar (
+		@restar= procedimiento (@n, @p) haga
+					letrec {
+						@res(@m, @j) = Si @m entonces evaluar @res(sub1(@j), sub1(@m)) finEval sino @j finSI
+					}
+					evaluar @res(@n, @p) finEval
+				finProc
+	) {
+		evaluar @restar(10, 3) finEval
+	}
 "))
