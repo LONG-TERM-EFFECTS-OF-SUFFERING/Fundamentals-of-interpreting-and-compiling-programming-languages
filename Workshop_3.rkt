@@ -4,7 +4,7 @@
 (provide #%module-begin)
 ; Calderón Prieto Brandon (2125874)
 ; Melo Burbano Deisy (2041790)
-
+; Repository URL:   https://github.com/LONG-TERM-EFFECTS-OF-SUFFERING/Fundamentals-of-interpreting-and-compiling-programming-languages/edit/main/Workshop_3.rkt 
 
 ; -------------------------------------------------------------------------- ;
 ;                                   GRAMMAR                                  ;
@@ -510,6 +510,7 @@
 "))
 
 ; ------------------------------------ E ----------------------------------- ;
+;Function that returns the names of the group members using a decorator
 
 (eval-program (scan&parse "
 	letrec {
@@ -520,6 +521,8 @@
 		evaluar @decorate() finEval
 "))
 
+; ------------------------------------ F ----------------------------------- ;
+;Function that returns the names of the group members using a decorator that takes another message as a parameter.
 
 (eval-program (scan&parse "
 	letrec {
