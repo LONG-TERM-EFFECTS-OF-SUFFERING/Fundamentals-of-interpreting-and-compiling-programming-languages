@@ -3,7 +3,6 @@
 (provide (all-from-out eopl))
 (provide #%module-begin)
 ; Calderón Prieto Brandon (2125874)
-; Corrales Carlos Daniel (2122878)
 ; Melo Burbano Deisy (2041790)
 
 
@@ -60,7 +59,7 @@
 	(white-sp (whitespace) skip)
 	(comment ("//" (arbno (not #\newline))) skip)
 	(identifier ("@" letter (arbno (or letter digit "?"))) symbol)
-	(text (letter (arbno (or letter digit "?" ":"))) string)
+	(text ((or letter "-") (arbno (or letter digit "-" "?" ":"))) string)
 	(number (digit (arbno digit)) number)
 	(number ("-" digit (arbno digit)) number)
 	(number (digit (arbno digit) "." digit (arbno digit)) number)
@@ -184,7 +183,7 @@
 (define buscar-variable (
 	lambda (env var) (
 		cases environment env
-			(empty-environment () (eopl:error "Error, la variable no existe"))
+			(empty-environment () var) ; (eopl:error "Error, la variable no existe")
 			(extended-environment (symbols values old-env) (
 					let (
 						(index (index-of var symbols))
@@ -353,6 +352,7 @@
 	)
 ))
 
+
 ; Contract: text or number, primitiva-binaria, text or number -> number or text
 ; Purpose: apply the given binary primitive operation to the two given operands.
 ; Returns the result of the operation applied to the two operands.
@@ -412,7 +412,7 @@
 
 ; ------------------------------------ A ----------------------------------- ;
 
-; Procedimiento que calcula el área de un circulo en base a una variable @radio
+; Procedure that calculates the area of the circle of radius "@radius".
 
 (eval-program (scan&parse "
 	declarar (
@@ -425,14 +425,14 @@
 
 ; ------------------------------------ B ----------------------------------- ;
 
-; Procedimiento que halla el factorial de un número @n = 5
+; Procedure that finds the factorial of a number @n = 5
 
 (eval-program (scan&parse "
 	declarar (
 		@n = 5;
 		@factorial = procedimiento (@n) haga
 						letrec {
-							@fact(@m)= Si @m entonces (@m * evaluar @fact (sub1(@m)) finEval) sino 1 finSI
+							@fact(@n)= Si @n entonces (@n * evaluar @fact (sub1(@n)) finEval) sino 1 finSI
 						}
 						evaluar @fact(@n) finEval
 					finProc
@@ -441,14 +441,15 @@
 	}
 "))
 
-; Procedimiento que halla el factorial de un número @n = 10
+
+; Procedure that finds the factorial of a number @n = 10
 
 (eval-program (scan&parse "
 	declarar (
 		@n = 10;
 		@factorial = procedimiento (@n) haga
 						letrec {
-							@fact(@m)= Si @m entonces (@m * evaluar @fact (sub1(@m)) finEval) sino 1 finSI
+							@fact(@n)= Si @n entonces (@n * evaluar @fact(sub1(@n)) finEval) sino 1 finSI
 						}
 						evaluar @fact(@n) finEval
 					finProc
@@ -459,7 +460,7 @@
 
 ; ------------------------------------ C ----------------------------------- ;
 
-; Procedimiento que realiza la suma de dos números implementando el sucesor y el predecesor
+; Procedure that performs the addition of two numbers by using the successor and the predecessor.
 
 (eval-program (scan&parse "
 	declarar (
@@ -470,23 +471,61 @@
 					evaluar @sum(@n) finEval
 				finProc
 	) {
-		evaluar @sumar (4, 5) finEval
+		evaluar @sumar(4, 5) finEval
 	}
 "))
 
 ; ------------------------------------ D ----------------------------------- ;
 
-; Procedimiento que realiza la resta de dos dumeros implementando el predecesor
+; Procedure that performs the subtraction of two numbers by using the predecessor.
 
 (eval-program (scan&parse "
 	declarar (
-		@restar= procedimiento (@n, @p) haga
+		@restar = procedimiento (@n, @p) haga
 					letrec {
-						@res(@m, @j) = Si @m entonces evaluar @res(sub1(@j), sub1(@m)) finEval sino @j finSI
+						@subtract(@m) = Si @m entonces sub1(evaluar @subtract(sub1(@m)) finEval) sino @n finSI
 					}
-					evaluar @res(@n, @p) finEval
+					evaluar @subtract(@p) finEval
 				finProc
 	) {
 		evaluar @restar(10, 3) finEval
 	}
+"))
+
+
+; Procedure that allows multiplying two numbers using only the "add1" and "sub1" primitives.
+
+(eval-program (scan&parse "
+	declarar (
+		@multiplicar = procedimiento (@a, @b) haga
+						letrec {
+							@sumar(@a, @b) = Si @a entonces evaluar @sumar(sub1(@a), add1(@b)) finEval sino @b finSI
+							@multiply(@a, @b) = Si @b entonces evaluar @sumar(@a, evaluar @multiply(@a, sub1(@b)) finEval) finEval sino 0 finSI
+						}
+						evaluar @multiply(@a, @b) finEval
+					finProc
+	) {
+		evaluar @multiplicar(10, 3) finEval
+	}
+"))
+
+; ------------------------------------ E ----------------------------------- ;
+
+(eval-program (scan&parse "
+	letrec {
+		@integrantes() = \"Brandon-Deisy\"
+		@saludar(@m) = (\"Hola:\" concat evaluar @m() finEval)
+		@decorate() = evaluar @saludar(@integrantes) finEval
+	}
+		evaluar @decorate() finEval
+"))
+
+
+(eval-program (scan&parse "
+	letrec {
+		@integrantes() = \"Brandon-Deisy\"
+		@saludar(@m) = (\"Hola:\" concat evaluar @m() finEval)
+		@decorate(@m) = (evaluar @saludar(@integrantes) finEval concat @m)
+	}
+		evaluar @decorate(\"-ProfesoresFLP\") finEval
 "))
